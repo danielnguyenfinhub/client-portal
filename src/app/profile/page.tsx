@@ -24,7 +24,7 @@ interface LoanCard {
   lender: string;
   lenderShort: string;
   amount: number | null;
-  interestRate: number | null;   // effective rate (after discount)
+  interestRate: number | null;
   baseRate: number | null;
   discountApplied: number | null;
   rateType: string | null;
@@ -94,7 +94,6 @@ export default function ProfilePage() {
       <Navbar />
       <main className="max-w-2xl mx-auto px-4 py-6 space-y-5">
 
-        {/* Page title */}
         <h1 className="text-2xl font-bold text-white">Your Profile</h1>
 
         {loading ? (
@@ -148,9 +147,9 @@ export default function ProfilePage() {
               ) : (
                 <div className="space-y-3">
                   {activeLoans.map((loan) => {
-                    const showDiscount = loan.discountApplied != null && loan.discountApplied > 0 && loan.baseRate != null;
+                    const hasDiscount = loan.discountApplied != null && loan.discountApplied > 0 && loan.baseRate != null;
+                    // interestRate is already the effective rate (baseRate - discount) from the API
                     const displayRate = loan.interestRate ?? loan.baseRate;
-                    const rateLabel = showDiscount ? 'Effective rate (after discount)' : (loan.isInterestOnly ? 'IO rate' : 'P&I rate');
                     const rateType = loan.rateType || 'Variable';
 
                     return (
@@ -170,15 +169,17 @@ export default function ProfilePage() {
                         {/* Rate + Amount */}
                         <div className="flex items-end gap-6">
                           <div>
+                            {hasDiscount && (
+                              <p className="text-xs text-gray-400 line-through mb-0.5">
+                                {loan.baseRate}% standard rate
+                              </p>
+                            )}
                             <p className="text-2xl font-bold text-gray-900">
                               {displayRate != null ? `${displayRate}%` : '—'}
                             </p>
-                            <p className="text-xs text-gray-400 mt-0.5">{rateLabel}</p>
-                            {showDiscount && (
-                              <p className="text-xs text-gray-400 mt-0.5 line-through">
-                                {loan.baseRate}% standard
-                              </p>
-                            )}
+                            <p className="text-xs text-gray-400 mt-0.5">
+                              {hasDiscount ? `Effective rate (${loan.discountApplied}% discount applied)` : (loan.isInterestOnly ? 'Interest only rate' : 'Your current rate')}
+                            </p>
                           </div>
                           {loan.amount != null && (
                             <div>
@@ -207,7 +208,7 @@ export default function ProfilePage() {
               rel="noopener noreferrer"
               className="block w-full bg-[#f5a623] hover:bg-[#d4891c] text-white text-center font-semibold text-base py-4 rounded-xl transition-all shadow-sm"
             >
-              📅 Loan Review With Your Broker
+              📅 Book a Loan Review With Your Broker
             </a>
           </>
         )}

@@ -58,7 +58,6 @@ function RateReviewModal({ loan, onClose }: { loan: any; onClose: () => void }) 
       style={{ backgroundColor: 'rgba(0,0,0,0.75)' }}
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
-      {/* Sheet on mobile, centred card on sm+ */}
       <div
         className="w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl p-6 shadow-2xl"
         style={{ backgroundColor: '#0f1d32', border: '1px solid #1a2d52' }}
@@ -84,13 +83,12 @@ function RateReviewModal({ loan, onClose }: { loan: any; onClose: () => void }) 
               <div>
                 <h3 className="text-white font-bold text-lg">Request Rate Review</h3>
                 <p className="text-gray-400 text-sm mt-0.5">
-                  We'll contact your lender to negotiate a better rate.
+                  We&apos;ll contact your lender to negotiate a better rate.
                 </p>
               </div>
               <button onClick={onClose} className="text-gray-500 hover:text-white ml-3 text-2xl leading-none">×</button>
             </div>
 
-            {/* Current rate chip */}
             <div
               className="rounded-xl p-4 mb-5 flex items-center justify-between"
               style={{ backgroundColor: 'rgba(245,166,35,0.08)', border: '1px solid rgba(245,166,35,0.25)' }}
@@ -105,7 +103,6 @@ function RateReviewModal({ loan, onClose }: { loan: any; onClose: () => void }) 
               {loan.lender && <p className="text-sm font-semibold text-gray-300">{loan.lender}</p>}
             </div>
 
-            {/* Optional message */}
             <div className="mb-5">
               <label className="block text-xs text-gray-500 uppercase tracking-wide mb-2">
                 Message to broker <span className="normal-case text-gray-600">(optional)</span>
@@ -251,7 +248,6 @@ export default function DashboardPage() {
         <RateReviewModal loan={primaryLoan} onClose={() => setShowRateModal(false)} />
       )}
 
-      {/* ── Content — max-w-2xl centres like mobile on all screens ── */}
       <main className="max-w-2xl mx-auto px-4 py-5 space-y-4">
 
         {/* Greeting */}
@@ -259,21 +255,24 @@ export default function DashboardPage() {
           <h1 className="text-xl font-bold text-white">
             Welcome back{firstName ? `, ${firstName}` : ''}! 👋
           </h1>
-          <p className="text-gray-400 text-sm mt-0.5">Here's your mortgage snapshot</p>
+          <p className="text-gray-400 text-sm mt-0.5">Here&apos;s your mortgage snapshot</p>
         </div>
 
-        {/* Book Appointment CTA — full width, always stacked below greeting */}
-        <button
-          onClick={() => window.open(BOOK_URL, '_blank')}
+        {/* Book Loan Review CTA — full width */}
+        <a
+          href={BOOK_URL}
+          target="_blank"
+          rel="noopener noreferrer"
           className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-semibold text-sm transition-all active:scale-[0.98]"
           style={{
             background: 'linear-gradient(135deg, #f5a623, #e8952c)',
             color: '#0a1628',
             boxShadow: '0 4px 16px rgba(245,166,35,0.25)',
+            display: 'flex',
           }}
         >
-          <span>📅</span> Book Appointment
-        </button>
+          <span>📅</span> Book a Loan Review With Your Broker
+        </a>
 
         {/* Critical alerts */}
         {criticalAlerts.length > 0 && (
@@ -305,7 +304,6 @@ export default function DashboardPage() {
             className="rounded-xl border overflow-hidden"
             style={{ backgroundColor: '#0f1d32', borderColor: '#1a2d52' }}
           >
-            {/* Stats grid — 2 columns, consistent on all sizes */}
             <div className="grid grid-cols-2 divide-x divide-y divide-[#1a2d52]">
               {/* Active Loans */}
               <div className="p-4">
@@ -319,9 +317,9 @@ export default function DashboardPage() {
                 <p className="text-2xl font-bold text-[#f5a623] mt-1">{fmtCurrency(totalBalance)}</p>
               </div>
 
-              {/* Interest Rate */}
+              {/* Effective Interest Rate */}
               <div className="p-4">
-                <p className="text-xs text-gray-500 uppercase tracking-wide">Interest Rate</p>
+                <p className="text-xs text-gray-500 uppercase tracking-wide">Effective Rate</p>
                 <div className="flex items-center gap-2 mt-1 flex-wrap">
                   <p className="text-2xl font-bold text-white">
                     {primaryLoan?.interestRate != null ? `${primaryLoan.interestRate}%` : '—'}
@@ -339,6 +337,9 @@ export default function DashboardPage() {
                     </span>
                   )}
                 </div>
+                {primaryLoan?.discountApplied != null && primaryLoan.discountApplied > 0 && primaryLoan.baseRate != null && (
+                  <p className="text-xs text-gray-500 mt-0.5 line-through">{primaryLoan.baseRate}% standard</p>
+                )}
                 <button
                   onClick={() => setShowRateModal(true)}
                   className="mt-1 text-xs font-medium text-[#60a5fa] hover:underline"
@@ -356,7 +357,6 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            {/* View full details link */}
             <div className="px-4 py-3 border-t border-[#1a2d52]">
               <button
                 onClick={() => router.push('/loans')}
@@ -367,7 +367,6 @@ export default function DashboardPage() {
             </div>
           </div>
         ) : (
-          /* No loans state */
           <div
             className="rounded-xl p-8 text-center border"
             style={{ backgroundColor: '#0f1d32', borderColor: '#1a2d52' }}
@@ -377,17 +376,19 @@ export default function DashboardPage() {
             <p className="text-gray-400 text-sm mt-1 mb-5">
               Your loan information will appear here once your application is in progress.
             </p>
-            <button
-              onClick={() => window.open(BOOK_URL, '_blank')}
+            <a
+              href={BOOK_URL}
+              target="_blank"
+              rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-5 py-3 rounded-xl font-semibold text-sm w-full justify-center"
-              style={{ background: 'linear-gradient(135deg, #f5a623, #e8952c)', color: '#0a1628' }}
+              style={{ background: 'linear-gradient(135deg, #f5a623, #e8952c)', color: '#0a1628', display: 'inline-flex' }}
             >
-              📅 Book a Free Appointment
-            </button>
+              📅 Book a Loan Review With Your Broker
+            </a>
           </div>
         )}
 
-        {/* Quick actions — 2 columns on ALL screen sizes (mobile-first) */}
+        {/* Quick actions */}
         <div>
           <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-3">Quick Actions</h2>
           <div className="grid grid-cols-2 gap-3">
