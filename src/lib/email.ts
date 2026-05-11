@@ -1,11 +1,16 @@
 import { Resend } from 'resend'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+// Resend is lazy-initialized inside each function
+
+function getResend() {
+  return new Resend(process.env.RESEND_API_KEY || 'placeholder')
+}
+
 const FROM = process.env.EMAIL_FROM || 'FinHub Portal <onboarding@resend.dev>'
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://portal.finhub.net.au'
 
 export async function sendOTPEmail(email: string, code: string, firstName: string) {
-  await resend.emails.send({
+  await getResend().emails.send({
     from: FROM,
     to: email,
     subject: `Your FinHub login code: ${code}`,
@@ -52,10 +57,10 @@ export async function sendRateReviewNotification({
 }) {
   const brokerEmail = process.env.BROKER_EMAIL || 'daniel@finhub.net.au';
 
-  await resend.emails.send({
+  await getResend().emails.send({
     from: FROM,
     to: brokerEmail,
-    replyTo: clientEmail || undefined,
+    reply_to: clientEmail || undefined,
     subject: `⚡ Rate Review Request — ${clientName}`,
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 560px; margin: 0 auto; padding: 32px; background: #f0f4ff; border-radius: 12px;">
@@ -106,7 +111,7 @@ export async function sendRateReviewNotification({
 
 export async function sendActivationEmail(email: string, token: string, firstName: string) {
   const link = `${APP_URL}/activate?token=${token}`
-  await resend.emails.send({
+  await getResend().emails.send({
     from: FROM,
     to: email,
     subject: 'Welcome to your FinHub Client Portal',
