@@ -184,8 +184,8 @@ export default function DashboardPage() {
 
   const quickActions = [
     {
-      emoji: '📅', label: 'Book Appointment',
-      description: 'Schedule a call with your broker',
+      emoji: '📅', label: 'Loan Review',
+      description: 'Book a session with your broker',
       color: '#f5a623', bg: 'rgba(245,166,35,0.1)', border: 'rgba(245,166,35,0.3)',
       action: () => window.open(BOOK_URL, '_blank'),
     },
@@ -319,7 +319,7 @@ export default function DashboardPage() {
 
               {/* Effective Interest Rate */}
               <div className="p-4">
-                <p className="text-xs text-gray-500 uppercase tracking-wide">Effective Rate</p>
+                <p className="text-xs text-gray-500 uppercase tracking-wide">Effective Interest Rate</p>
                 <div className="flex items-center gap-2 mt-1 flex-wrap">
                   <p className="text-2xl font-bold text-white">
                     {primaryLoan?.interestRate != null ? `${primaryLoan.interestRate}%` : '—'}

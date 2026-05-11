@@ -148,7 +148,7 @@ export default function ProfilePage() {
                 <div className="space-y-3">
                   {activeLoans.map((loan) => {
                     const hasDiscount = loan.discountApplied != null && loan.discountApplied > 0 && loan.baseRate != null;
-                    // interestRate is already the effective rate (baseRate - discount) from the API
+                    // interestRate is already the effective rate (baseRate − discount) from the portal API
                     const displayRate = loan.interestRate ?? loan.baseRate;
                     const rateType = loan.rateType || 'Variable';
 
@@ -178,7 +178,9 @@ export default function ProfilePage() {
                               {displayRate != null ? `${displayRate}%` : '—'}
                             </p>
                             <p className="text-xs text-gray-400 mt-0.5">
-                              {hasDiscount ? `Effective rate (${loan.discountApplied}% discount applied)` : (loan.isInterestOnly ? 'Interest only rate' : 'Your current rate')}
+                              {hasDiscount
+                                ? `Effective Interest Rate (${loan.discountApplied}% discount applied)`
+                                : 'Effective Interest Rate'}
                             </p>
                           </div>
                           {loan.amount != null && (
