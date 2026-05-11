@@ -12,31 +12,35 @@ export async function GET(req: NextRequest) {
     if (!loansRes.ok) throw new Error('Failed to fetch loans');
     const loans: any[] = await loansRes.json();
 
-    // Enrich the first active loan with product details (to get interest rate)
+    // Enrich ALL active loans with product details (to get effective rate)
     const activeLoans = loans.filter((l: any) => l.isActive !== false);
-    let enrichedLoans = loans;
+    const enriched = new Map<string, any>();
 
-    if (activeLoans.length > 0) {
-      try {
-        const detailRes = await fetch(`${PORTAL}/loan/${activeLoans[0].loan_id}`);
-        if (detailRes.ok) {
+    await Promise.all(
+      activeLoans.map(async (loan: any) => {
+        try {
+          const detailRes = await fetch(`${PORTAL}/loan/${loan.loan_id}`);
+          if (!detailRes.ok) return;
           const detail = await detailRes.json();
           const primaryProduct = detail.products?.[0];
-          enrichedLoans = loans.map((l: any) => {
-            if (l.loan_id === activeLoans[0].loan_id) {
-              return {
-                ...l,
-                interestRate: primaryProduct?.baseRate ?? null,
-                rateType: primaryProduct?.rateType ?? null,
-                isInterestOnly: primaryProduct?.isInterestOnly ?? false,
-                products: detail.products || [],
-              };
-            }
-            return l;
+          // effectiveRate = baseRate - discountApplied (already computed in portal-router)
+          const effectiveRate = primaryProduct?.effectiveRate ?? primaryProduct?.baseRate ?? null;
+          enriched.set(loan.loan_id, {
+            interestRate: effectiveRate,
+            baseRate: primaryProduct?.baseRate ?? null,
+            discountApplied: primaryProduct?.discountApplied ?? null,
+            rateType: primaryProduct?.rateType ?? null,
+            isInterestOnly: primaryProduct?.isInterestOnly ?? false,
+            products: detail.products || [],
           });
-        }
-      } catch { /* enrichment failure is non-fatal */ }
-    }
+        } catch { /* enrichment failure is non-fatal */ }
+      })
+    );
+
+    const enrichedLoans = loans.map((l: any) => {
+      const extra = enriched.get(l.loan_id);
+      return extra ? { ...l, ...extra } : l;
+    });
 
     return NextResponse.json({ loans: enrichedLoans });
   } catch (err: any) {
